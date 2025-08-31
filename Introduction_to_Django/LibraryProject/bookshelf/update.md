@@ -1,4 +1,4 @@
-from your_app_name.models import Book
+from bookshel.models import Book
 book = Book.objects.get(title="1984")
 book.title = "Nineteen Eighty-Four"
 book.save()
