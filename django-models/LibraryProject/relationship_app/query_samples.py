@@ -37,7 +37,7 @@ def run_queries():
 
     # List all books in a library.
     print(f"2. Listing all books in the library: {library_name.name}")
-    library_books = library_name.books.all()
+    library_books = Library.objects.get(name=library_name.name)
     
     if library_books.exists():
         for book in library_books:
