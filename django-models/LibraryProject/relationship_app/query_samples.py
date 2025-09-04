@@ -16,10 +16,10 @@ def run_queries():
     book1 = Book.objects.create(title="1984", author=author1, publication_year=1949)
     book2 = Book.objects.create(title="Animal Farm", author=author1, publication_year=1945)
 
-    main_library = Library.objects.create(name="Main City Library")
-    main_library.books.add(book1, book2)   
+    library_name = Library.objects.create(name="Main City Library")
+    library_name.books.add(book1, book2)   
  
-    librarian1 = Librarian.objects.create(name="Jane Doe", library=main_library)
+    librarian1 = Librarian.objects.create(name="Jane Doe", library=library_name)
 
 
     print("--- Executing queries ---")
@@ -35,8 +35,8 @@ def run_queries():
     print("-" * 20)
 
     # List all books in a library.
-    print(f"2. Listing all books in the library: {main_library.name}")
-    library_books = main_library.books.all()
+    print(f"2. Listing all books in the library: {library_name.name}")
+    library_books = Library.objects.get(name=library_name)
     if library_books.exists():
         for book in library_books:
             print(f"   - Found book: '{book.title}'")
@@ -45,9 +45,9 @@ def run_queries():
     print("-" * 20)
 
     #Retrieve the librarian for a library.
-    print(f"3. Retrieving the librarian for the library: {main_library.name}")
+    print(f"3. Retrieving the librarian for the library: {library_name.name}")
     try:
-        library_librarian = main_library.librarian
+        library_librarian = library_name.librarian
         print(f"   - Found librarian: {library_librarian.name}")
     except Librarian.DoesNotExist:
         print("   - No librarian found for this library.")
