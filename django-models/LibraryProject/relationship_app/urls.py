@@ -3,6 +3,8 @@ from .views import list_books
 from .views import LibraryView
 from . import views
 
+#LibraryDetailView
+
 
 
 urlpatterns = [
