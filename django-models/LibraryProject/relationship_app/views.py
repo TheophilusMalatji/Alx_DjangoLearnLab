@@ -25,6 +25,8 @@ class LibraryView(ListView):
         context['books'] = self.object.books.all()
         return context
 
+# UserCreationForm()
+#relationship_app/register.html
 class SignUpView(UserCreationForm):
     form_class = UserCreationForm
     template_name = 'registration/register.html'
