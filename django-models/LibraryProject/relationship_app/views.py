@@ -56,5 +56,5 @@ class MemberRequiredMixin(UserPassesTestMixin):
         return is_member(self.request.user)
 
 @user_passes_test
-class AdminView(AdminRequiredMixin, TemplateView):
+class Admin(AdminRequiredMixin, TemplateView):
     template_name = 'roles/admin_dashboard.html'
