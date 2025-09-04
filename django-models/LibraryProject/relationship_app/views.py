@@ -20,6 +20,19 @@ def is_librarian(user):
 def is_member(user):
     return hasattr(user, 'userprofile') and user.userprofile.role == 'Member'
 
+class AdminRequiredMixin(UserPassesTestMixin):
+    def test_func(self):
+        return is_admin(self.request.user)
+
+class LibrarianRequiredMixin(UserPassesTestMixin):
+    def test_func(self):
+        return is_librarian(self.request.user)
+
+class MemberRequiredMixin(UserPassesTestMixin):
+    def test_func(self):
+        return is_member(self.request.user)
+
+
 @login_required
 def list_books(request):
     books = Book.objects.all()
@@ -50,11 +63,11 @@ class LibrarianRequiredMixin(UserPassesTestMixin):
     def test_func(self):
         return is_librarian(self.request.user)
 
-
+@user_passes_test
 class MemberRequiredMixin(UserPassesTestMixin):
     def test_func(self):
         return is_member(self.request.user)
 
-@user_passes_test
+
 class Admin(AdminRequiredMixin, TemplateView):
     template_name = 'roles/admin_dashboard.html'
