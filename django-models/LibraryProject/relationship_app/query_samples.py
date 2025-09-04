@@ -46,6 +46,7 @@ def run_queries():
         print("   - No books found in this library.")
     print("-" * 20)
     #Retrieve the librarian for a library.
+    #"Library.objects.get(name=library_name)", "books.all()
     print(f"3. Retrieving the librarian for the library: {library_name.name}")
     try:
         library_librarian = library_name.librarian
