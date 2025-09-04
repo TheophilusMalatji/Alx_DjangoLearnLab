@@ -1,10 +1,16 @@
-from django.shortcuts import render
-from django.views.generic import ListView
+from django.shortcuts import render, redirect
+from django.views.generic import ListView, CreateView
+from django.contrib.auth.forms import UserCreationForm
+from django.urls import reverse_lazy
 from .models import Library, Book
 from django.views.generic.detail import DetailView
 
+from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.decorators import login_required
+
 # Create your views here.
 
+@login_required
 def list_books(request):
     books = Book.objects.all()
     context = {list_books:books}
@@ -18,3 +24,25 @@ class LibraryView(ListView):
         context = super().get_context_data(**kwargs)        
         context['books'] = self.object.books.all()
         return context
+
+class SignUpView(CreateView):
+    form_class = UserCreationForm
+    success_url = reverse_lazy('login')
+
+def custom_login(request):
+    if request.method == "POST":
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('list_books')
+    else:
+        form = AuthenticationForm()
+    return render(request, 'registration/login.html', {'form': form})
+
+def custom_logout(request):
+    logout(request)
+    return redirect('login')
