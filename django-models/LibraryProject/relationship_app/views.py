@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.views.generic import ListView
 from .models import Library
+from django.views.generic.detail import DetailView
 
 # Create your views here.
 
