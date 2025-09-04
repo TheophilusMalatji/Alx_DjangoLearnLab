@@ -15,6 +15,7 @@ def run_queries():
     author1 = Author.objects.create(name="George Orwell")
     book1 = Book.objects.create(title="1984", author=author1, publication_year=1949)
     book2 = Book.objects.create(title="Animal Farm", author=author1, publication_year=1945)
+    books = [book1,book2]
 
     library_name = Library.objects.create(name="Main City Library")
     library_name.books.add(book1, book2)   
@@ -36,14 +37,14 @@ def run_queries():
 
     # List all books in a library.
     print(f"2. Listing all books in the library: {library_name.name}")
-    library_books = Library.objects.get(name=library_name)
+    library_books = library_name.books.all()
+    
     if library_books.exists():
         for book in library_books:
             print(f"   - Found book: '{book.title}'")
     else:
         print("   - No books found in this library.")
     print("-" * 20)
-
     #Retrieve the librarian for a library.
     print(f"3. Retrieving the librarian for the library: {library_name.name}")
     try:
