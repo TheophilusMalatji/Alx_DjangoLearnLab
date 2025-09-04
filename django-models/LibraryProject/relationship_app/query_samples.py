@@ -36,6 +36,7 @@ def run_queries():
     print("-" * 20)
 
     # List all books in a library.
+    #"Author.objects.get(name=author_name)", "objects.filter(author=author)
     print(f"2. Listing all books in the library: {library_name.name}")
     library_books = Library.objects.get(name=library_name.name)
     
