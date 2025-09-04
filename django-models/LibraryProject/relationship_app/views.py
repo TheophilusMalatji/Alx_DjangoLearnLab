@@ -25,7 +25,8 @@ class LibraryView(ListView):
         context['books'] = self.object.books.all()
         return context
 
-class SignUpView(CreateView):
+class SignUpView(UserCreationForm):
     form_class = UserCreationForm
+    template_name = 'registration/register.html'
     success_url = reverse_lazy('login')
 
