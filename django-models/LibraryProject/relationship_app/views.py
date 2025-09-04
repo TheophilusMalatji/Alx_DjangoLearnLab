@@ -1,14 +1,24 @@
 from django.shortcuts import render, redirect
-from django.views.generic import ListView, CreateView
+from django.views.generic import ListView, CreateView,TemplateView
 from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
 from .models import Library, Book
 from django.views.generic.detail import DetailView
+from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 
 # Create your views here.
+
+def is_admin(user):
+    return hasattr(user, 'userprofile') and user.userprofile.role == 'Admin'
+
+def is_librarian(user):
+    return hasattr(user, 'userprofile') and user.userprofile.role == 'Librarian'
+
+def is_member(user):
+    return hasattr(user, 'userprofile') and user.userprofile.role == 'Member'
 
 @login_required
 def list_books(request):
@@ -32,21 +42,18 @@ class SignUpView(UserCreationForm):
     template_name = 'registration/register.html'
     success_url = reverse_lazy('login')
 
-def Admin(user):   
-    return hasattr(user, 'userprofile') and user.userprofile.role == 'Admin'
+class AdminRequiredMixin(UserPassesTestMixin):
+    def test_func(self):
+        return is_admin(self.request.user)
 
-def Librarian(user):    
-    return hasattr(user, 'userprofile') and user.userprofile.role == 'Librarian'
+class LibrarianRequiredMixin(UserPassesTestMixin):
+    def test_func(self):
+        return is_librarian(self.request.user)
 
-def Member(user):    
-    return hasattr(user, 'userprofile') and user.userprofile.role == 'Member'
+class MemberRequiredMixin(UserPassesTestMixin):
+    def test_func(self):
+        return is_member(self.request.user)
 
-@user_passes_test(Admin)
-def admin_view(request):
-    return render(request, 'relationship_app/admin_view.html')
-@user_passes_test(Member)
-def admin_view(request):
-    return render(request, 'relationship_app/member_view.html')
-@user_passes_test(Librarian)
-def admin_view(request):
-    return render(request, 'relationship_app/librarian_view.html')
+
+class AdminView(AdminRequiredMixin, TemplateView):
+    template_name = 'roles/admin_dashboard.html'
