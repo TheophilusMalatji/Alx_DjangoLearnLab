@@ -67,7 +67,8 @@ class MemberRequiredMixin(UserPassesTestMixin):
         return is_member(self.request.user)
 
 
-class admin_view(AdminRequiredMixin, TemplateView):
+class Admin(AdminRequiredMixin, TemplateView):
+    template_name = 'relationship_app/admin_view.html'
     template_name = 'relationship_app/admin_view.html'
 
 
