@@ -10,72 +10,59 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 
 def is_admin(user):
-    return hasattr(user, 'userprofile') and user.userprofile.role == 'Admin'
+    return user.userprofile.role == 'Admin'
 
 def is_librarian(user):
-    return hasattr(user, 'userprofile') and user.userprofile.role == 'Librarian'
+    return user.userprofile.role == 'Librarian'
 
 def is_member(user):
-    return hasattr(user, 'userprofile') and user.userprofile.role == 'Member'
-
-class AdminRequiredMixin(UserPassesTestMixin):
-    def test_func(self):
-        return is_admin(self.request.user)
-
-class LibrarianRequiredMixin(UserPassesTestMixin):
-    def test_func(self):
-        return is_librarian(self.request.user)
-
-class MemberRequiredMixin(UserPassesTestMixin):
-    def test_func(self):
-        return is_member(self.request.user)
-
+    return user.userprofile.role == 'Member'
 
 @login_required
-def list_books(request):
-    books = Book.objects.all()
-    context = {list_books:books}
-    return render(request,'relationship_app/list_books.html', context )
-class LibraryView(ListView):
-    model = Library
-    template_name = "relationship_app/library_detail.html"
-    
+@user_passes_test(is_admin)
+def Admin(request):
+    return render(request, 'relationship_app/admin_view.html')
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)        
-        context['books'] = self.object.books.all()
-        return context
+@login_required
+@user_passes_test(is_librarian)
+def librarian_view(request):
+    return render(request, 'relationship_app/librarian_view.html')
 
-# UserCreationForm()
-#relationship_app/register.html
-class SignUpView(UserCreationForm):
-    form_class = UserCreationForm
-    template_name = 'registration/register.html'
-    success_url = reverse_lazy('login')
+@login_required
+@user_passes_test(is_member)
+def member_view(request):
+    return render(request, 'relationship_app/member_view.html')
 
-class AdminRequiredMixin(UserPassesTestMixin):
-    def test_func(self):
-        return is_admin(self.request.user)
+@permission_required('relationship_app.can_add_book', raise_exception=True)
+def add_book(request):
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        author_id = request.POST.get('author')
+        publication_year = request.POST.get('publication_year')
 
-class LibrarianRequiredMixin(UserPassesTestMixin):
-    def test_func(self):
-        return is_librarian(self.request.user)
+        book = Book(title=title, author_id=author_id, publication_year=publication_year)
+        book.save()
+        return redirect('book_list')  
+    return render(request, 'relationship_app/add_book.html')
 
-@user_passes_test
-class MemberRequiredMixin(UserPassesTestMixin):
-    def test_func(self):
-        return is_member(self.request.user)
+@permission_required('relationship_app.can_change_book', raise_exception=True)
+def edit_book(request, book_id):
+    book = get_object_or_404(Book, id=book_id)
 
+    if request.method == 'POST':
+        book.title = request.POST.get('title')
+        book.author_id = request.POST.get('author')
+        book.publication_year = request.POST.get('publication_year')
+        book.save()
+        return redirect('book_list')  
+    return render(request, 'relationship_app/edit_book.html', {'book': book})
 
-class Admin(AdminRequiredMixin, TemplateView):
-    template_name = 'relationship_app/admin_view.html'
-    template_name = 'relationship_app/admin_view.html'
+@permission_required('relationship_app.can_delete_book', raise_exception=True)
+def delete_book(request, book_id):
+    book = get_object_or_404(Book, id=book_id)
 
+    if request.method == 'POST':
+        book.delete()
+        return redirect('book_list')  
 
-class LibrarianView(LibrarianRequiredMixin, TemplateView):
-    """View accessible only to Librarian users."""
-    template_name = 'relationship_app/librarian_view.html'
-
-class member_view(MemberRequiredMixin, TemplateView):
-    """View accessible only to Member users."""
-    template_name = 'relationship_app/member_view.html'
+    return render(request, 'relationship_app/delete_book.html', {'book': book})
