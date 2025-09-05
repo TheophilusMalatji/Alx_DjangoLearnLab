@@ -1,82 +1,85 @@
-from django.shortcuts import render, redirect
-from django.views.generic import ListView, CreateView,TemplateView
-from django.contrib.auth.forms import UserCreationForm
-from django.urls import reverse_lazy
-from .models import Library, Book
+from typing import Any
+from django.shortcuts import render,redirect
+from .models import Book, Library
 from django.views.generic.detail import DetailView
-from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.contrib.auth import login, logout, authenticate
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import login
+from django.contrib.auth.decorators import permission_required
+
+
 
 # Create your views here.
-
-def is_admin(user):
-    return hasattr(user, 'userprofile') and user.userprofile.role == 'Admin'
-
-def is_librarian(user):
-    return hasattr(user, 'userprofile') and user.userprofile.role == 'Librarian'
-
-def is_member(user):
-    return hasattr(user, 'userprofile') and user.userprofile.role == 'Member'
-
-class AdminRequiredMixin(UserPassesTestMixin):
-    def test_func(self):
-        return is_admin(self.request.user)
-
-class LibrarianRequiredMixin(UserPassesTestMixin):
-    def test_func(self):
-        return is_librarian(self.request.user)
-
-class MemberRequiredMixin(UserPassesTestMixin):
-    def test_func(self):
-        return is_member(self.request.user)
-
-
-@login_required
+#Function-based views
 def list_books(request):
-    books = Book.objects.all()
-    context = {list_books:books}
-    return render(request,'relationship_app/list_books.html', context )
-class LibraryView(ListView):
+    books = Book.objects.all() #fetching all books from the database
+    context = {'list_books':books} #creates a context dictionary with list of books
+    return render(request, 'relationship_app/list_books.html', context)
+
+#class-based view for listing books in a library
+class LibraryDetailView(DetailView):
     model = Library
-    template_name = "relationship_app/library_detail.html"
+    template_name = 'relationship_app/library_detail.html'
+    
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        library = self.get_object()
+        context['books_list'] = library.get_books_list()
+        return context
     
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)        
-        context['books'] = self.object.books.all()
-        return context
+#Setup User Authentication Views
 
-# UserCreationForm()
-#relationship_app/register.html
-class SignUpView(UserCreationForm):
-    form_class = UserCreationForm
-    template_name = 'registration/register.html'
-    success_url = reverse_lazy('login')
+def register(request):
+    if request.method == "POST":
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect ("index")
+    else:
+        form = UserCreationForm()
+    return render(request, "relationship_app/register.html", {"form": form})
 
-class AdminRequiredMixin(UserPassesTestMixin):
-    def test_func(self):
-        return is_admin(self.request.user)
+#User Login View
+class CustomLoginView(LoginView):
+    template_name = "login.html"
 
-class LibrarianRequiredMixin(UserPassesTestMixin):
-    def test_func(self):
-        return is_librarian(self.request.user)
+#user Logout View
+class CustomLogoutView(LogoutView):
+    template_name = "logout.html"
 
-@user_passes_test
-class MemberRequiredMixin(UserPassesTestMixin):
-    def test_func(self):
-        return is_member(self.request.user)
+#Homepage View
+def index(request):
+    return render(request, "index.html")
 
+#Setting Up Role-Based Views
+#Checks if user is Admin
+def is_admin(user):
+    return user.userprofile.role == 'Admin'
 
-class Admin(AdminRequiredMixin, TemplateView):
-    template_name = 'relationship_app/admin_view.html'
+@login_required
+@user_passes_test(is_admin)
+def admin_view(request):
+    return render(request, 'relationship_app/admin_view.html')
 
+#Checks if user is Librarian
+def is_librarian(user):
+    return user.userprofile.role == 'Librarian'
 
-class LibrarianView(LibrarianRequiredMixin, TemplateView):
-    """View accessible only to Librarian users."""
-    template_name = 'relationship_app/librarian_view.html'
+@login_required
+@user_passes_test(is_librarian)
 
-class member_view(MemberRequiredMixin, TemplateView):
-    """View accessible only to Member users."""
-    template_name = 'relationship_app/member_view.html'
+def librarian_view(request):
+    return render(request, 'relationship_app/librarian_view.html')
+
+#Checks if user is a Member
+def is_member(user):
+    return user.userprofile.role == 'Member'
+
+@login_required
+@user_passes_test(is_member)
+def member_view(request):
+    return render(request, 'relationship_app/member_view.html')
+
