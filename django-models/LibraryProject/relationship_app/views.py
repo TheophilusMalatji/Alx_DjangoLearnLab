@@ -59,7 +59,7 @@ def is_member(user):
 
 @login_required
 @user_passes_test(is_admin)
-def Admin(request):
+def AdminView(request):
     return render(request, 'relationship_app/admin_view.html')
 
 @login_required
