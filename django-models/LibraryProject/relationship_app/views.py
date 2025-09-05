@@ -7,29 +7,29 @@ from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
 from django.contrib.auth.decorators import permission_required
-
-
+from django.urls import reverse_lazy
 
 # Create your views here.
-#Function-based views
+
+
+
+
+
+
+@login_required
 def list_books(request):
-    books = Book.objects.all() #fetching all books from the database
-    context = {'list_books':books} #creates a context dictionary with list of books
-    return render(request, 'relationship_app/list_books.html', context)
-
-#class-based view for listing books in a library
-class LibraryDetailView(DetailView):
+    books = Book.objects.all()
+    context = {list_books:books}
+    return render(request,'relationship_app/list_books.html', context )
+class LibraryView(DetailView):
     model = Library
-    template_name = 'relationship_app/library_detail.html'
-    
-    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
-        context = super().get_context_data(**kwargs)
-        library = self.get_object()
-        context['books_list'] = library.get_books_list()
-        return context
+    template_name = "relationship_app/library_detail.html"
     
 
-#Setup User Authentication Views
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)        
+        context['books'] = self.object.books.all()
+        return context
 
 def register(request):
     if request.method == "POST":
@@ -42,20 +42,11 @@ def register(request):
         form = UserCreationForm()
     return render(request, "relationship_app/register.html", {"form": form})
 
-#User Login View
-class CustomLoginView(LoginView):
-    template_name = "login.html"
+class SignUpView(UserCreationForm):
+    form_class = UserCreationForm
+    template_name = 'relationship_app/register.html'
+    success_url = reverse_lazy('login')
 
-#user Logout View
-class CustomLogoutView(LogoutView):
-    template_name = "logout.html"
-
-#Homepage View
-def index(request):
-    return render(request, "index.html")
-
-#Setting Up Role-Based Views
-#Checks if user is Admin
 def is_admin(user):
     return user.userprofile.role == 'Admin'
 
@@ -64,7 +55,6 @@ def is_admin(user):
 def admin_view(request):
     return render(request, 'relationship_app/admin_view.html')
 
-#Checks if user is Librarian
 def is_librarian(user):
     return user.userprofile.role == 'Librarian'
 
@@ -74,7 +64,6 @@ def is_librarian(user):
 def librarian_view(request):
     return render(request, 'relationship_app/librarian_view.html')
 
-#Checks if user is a Member
 def is_member(user):
     return user.userprofile.role == 'Member'
 
@@ -82,4 +71,3 @@ def is_member(user):
 @user_passes_test(is_member)
 def member_view(request):
     return render(request, 'relationship_app/member_view.html')
-
