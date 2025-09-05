@@ -1,13 +1,14 @@
-from typing import Any
-from django.shortcuts import render,redirect
-from .models import Book, Library
+from django.shortcuts import render
+from .models import Book
+from .models import Library
 from django.views.generic.detail import DetailView
-from django.contrib.auth.decorators import login_required, user_passes_test
-from django.contrib.auth.views import LoginView, LogoutView
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.http import HttpResponseForbidden
+from .models import UserProfile
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import permission_required
-from django.urls import reverse_lazy
 
 # Create your views here.
 
@@ -58,7 +59,7 @@ def is_member(user):
 
 @login_required
 @user_passes_test(is_admin)
-def admin_view(request):
+def Admin(request):
     return render(request, 'relationship_app/admin_view.html')
 
 @login_required
