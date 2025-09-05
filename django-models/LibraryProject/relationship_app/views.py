@@ -57,7 +57,7 @@ def is_librarian(user):
 def is_member(user):
     return user.userprofile.role == 'Member'
 
-@login_required
+
 @user_passes_test(is_admin, login_url="relationship_app:login")
 def admin_view(request):
     return render(request, 'relationship_app/admin_view.html')
