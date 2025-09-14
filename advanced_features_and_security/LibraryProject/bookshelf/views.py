@@ -10,7 +10,7 @@ from forms import BookForm
 def book_list(request):
     books = Book.objects.all()
     context = books
-    return render(request,"book_list.html",context)
+    return render(request,"bookshelf/book_list.html",context)
 
 @permission_required('bookshelf.can_create', raise_exception=True)
 def create_book(request):
@@ -22,7 +22,7 @@ def create_book(request):
     else:
         form = BookForm()
         context = {'form':form}
-    return render(request, 'form_example.html',context)
+    return render(request, 'bookshelf/form_example.html',context)
 
     
     return HttpResponse("You have permission")
