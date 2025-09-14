@@ -1,34 +1,30 @@
-from django.shortcuts import render
+# your_app_name/views.py
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponseForbidden
+from django.contrib.auth.decorators import permission_required
 from .models import Book
 from django.db.models import Permission
-# Create your views here.
+from django.http import HttpResponse
+
+
+
+
+@permission_required('bookshelf.can_view', raise_exception=True)
 def book_list(request):
-    if not request.user.has_perm('your_app_name.can_view'):
-        return HttpResponseForbidden("You do not have permission to view this page.")
     books = Book.objects.all()
-    return render(request, 'books/book_list.html', {'books': books})
+    return HttpResponse("You have permission")
 
-# Create a new book
+@permission_required('bookshelf.can_create', raise_exception=True)
 def create_book(request):
-    if not request.user.has_perm('your_app_name.can_create'):
-        return HttpResponseForbidden("You do not have permission to create books.")
-    # ... logic to handle form submission and create a new book
-    return redirect('book_list')
+    
+    return HttpResponse("You have permission")
 
-# Edit an existing book
+@permission_required('bookshelf.can_edit', raise_exception=True)
 def edit_book(request, pk):
-    if not request.user.has_perm('your_app_name.can_edit'):
-        return HttpResponseForbidden("You do not have permission to edit this book.")
     book = get_object_or_404(Book, pk=pk)
-    # ... logic to handle form submission and edit the book
-    return redirect('book_list')
+    return HttpResponse("You have permission")
 
-# Delete a book
+@permission_required('bookshelf.can_delete', raise_exception=True)
 def delete_book(request, pk):
-    if not request.user.has_perm('your_app_name.can_delete'):
-        return HttpResponseForbidden("You do not have permission to delete this book.")
     book = get_object_or_404(Book, pk=pk)
     book.delete()
-    return redirect('book_list')
+    return HttpResponse("You have permission")
