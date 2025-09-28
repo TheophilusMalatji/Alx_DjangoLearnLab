@@ -3,14 +3,6 @@ from .models import Book,Author
 from datetime import datetime
 
 
-class AuthorSerializer(serializers.ModelSerializer):
-    """
-    Gets author name
-    """
-    
-    class Meta:
-        model = Author
-        fields = '__all__'
 
 class BookSerializer(serializers.ModelSerializer):
     author_name = serializers.CharField(source='author.name', many=True, read_only=True)
@@ -27,3 +19,12 @@ class BookSerializer(serializers.ModelSerializer):
         if data['publication_year'] > current_year:
             raise serializers.ValidationError("Publication date can not be future date")
         return data
+    
+class AuthorSerializer(serializers.ModelSerializer):
+    """
+    Author will now allow for multilpe books to be attached to it. 
+    """
+    books =BookSerializer(many=True, read_only=True)
+    class Meta:
+        model = Author
+        fields = '__all__'
