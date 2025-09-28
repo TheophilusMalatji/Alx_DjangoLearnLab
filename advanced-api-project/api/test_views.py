@@ -3,7 +3,8 @@ from django.urls import reverse
 from rest_framework.test import APIClient
 from django.contrib.auth.models import User
 from datetime import datetime
-from .models import Book, Author # Explicitly import models
+from .models import Book, Author 
+from rest_framework import status
 
 
 # --- Base Test Setup ---
@@ -144,14 +145,14 @@ class BookTests(BaseAPITestCase):
         
         
 # --- Permission/Authentication Tests ---
-
-class PermissionTests(BaseAPITestCase):
-    """Test all permissions with endpoints"""
-    VALID_PAYLOAD = {
+VALID_PAYLOAD = {
     'title': 'Permission Test Book',
     'author': 1, # Use a valid PK
     'publication_year': datetime.now().year
 }
+class PermissionTests(BaseAPITestCase):
+    """Test all permissions with endpoints"""
+    
     # --- Read Access (BookListView) ---
     
     
