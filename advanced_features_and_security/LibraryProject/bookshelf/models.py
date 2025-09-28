@@ -10,7 +10,7 @@ class CustomUser(AbstractUser):
 
     date_of_birth = models.DateField()
     profile_photo = models.ImageField()
-    objects = CustomUserManager()
+    #objects = CustomUserManager()
     def __str__(self):
         return self.username
 
