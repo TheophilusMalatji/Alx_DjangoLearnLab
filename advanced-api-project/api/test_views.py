@@ -24,6 +24,8 @@ class BaseAPITestCase(TestCase):
         self.auth_client.force_authenticate(user=self.user)
         self.admin_client = APIClient()
         self.admin_client.force_authenticate(user=self.admin_user)
+        self.client.login = APIClient()
+        
 
         # 2. Setup Base Data
         self.author_one = Author.objects.create(name="Jane Austen")
