@@ -1,6 +1,7 @@
 from django.shortcuts import render
-from rest_framework import generics
-from serializers import *
+from rest_framework import generics, filters
+from .serializers import *
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.permissions import BasePermission
 
@@ -17,17 +18,20 @@ class BookCreateView(generics.ListCreateAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
     permission_classes = [IsAdminUser]
-
+    
 class BookListView(generics.ListAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend,filters.SearchFilter,filters.OrderingFilter]
+    filterset_fields = ['author','publication_year','title']
+    order_fields = ['title','publication_year']
 
 class BookDetailView(generics.RetrieveAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
 
-class BookUpdateView(generics.ListUpdateAPIView):
+class BookUpdateView(generics.RetrieveAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
     permission_classes = [IsAdminUser]

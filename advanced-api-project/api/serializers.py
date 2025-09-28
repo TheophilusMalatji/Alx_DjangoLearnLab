@@ -5,9 +5,9 @@ from datetime import datetime
 
 
 class BookSerializer(serializers.ModelSerializer):
-    author_name = serializers.CharField(source='author.name', many=True, read_only=True)
+    #author_name = serializers.CharField(source='author.name', many=True, read_only=True)
     class Meta:
-        models = Book
+        model = Book
         fields = '__all__'
     """
     Uses datetime to get current year then compares it to the publication value in the the Book data. If the year is higher than current 
