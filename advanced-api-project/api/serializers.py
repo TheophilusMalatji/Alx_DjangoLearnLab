@@ -7,7 +7,7 @@ class AuthorSerializer(serializers.ModelSerializer):
     """
     Gets author name
     """
-    name = serializers.CharField(source='author.name')
+    name = serializers.CharField(source='author.name', many=True, read_only=True)
     class Meta:
         model = Author
         fields = '__all__'
