@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from .models import Post, Comment
 from taggit.forms import TagWidget
 
-
+#TagWidget() implemented
 class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(required=True)
 
