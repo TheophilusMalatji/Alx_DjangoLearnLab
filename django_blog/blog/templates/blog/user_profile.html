@@ -1,0 +1,53 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}User Profile{% endblock title %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow-lg p-5 mt-5">
+            <h2 class="card-title text-center mb-4 text-success">User Profile</h2>
+            
+            <a class="btn btn-outline-info mb-4" data-bs-toggle="collapse" href="#editForm" role="button" aria-expanded="false" aria-controls="editForm">
+                Edit Profile
+            </a>
+
+            <div class="list-group mb-4">
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+                    <p class="mb-0 fw-bold">Username:</p>
+                    <span class="badge bg-dark fs-6">{{ user.username }}</span>
+                </div>
+                
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+                    <p class="mb-0 fw-bold">Email:</p>
+                    <span class="text-muted">{{ user.email|default:"Not provided" }}</span>
+                </div>
+                
+                </div>
+            
+            <div class="collapse" id="editForm">
+                <div class="card card-body bg-light">
+                    <h5 class="mb-3">Update Email</h5>
+                    <form method="POST">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.email.id_for_label }}" class="form-label">{{ form.email.label }}</label>
+                            {{ form.email }}
+                            {% for error in form.email.errors %}
+                                <div class="alert alert-danger p-1 mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        
+                        <button type="submit" class="btn btn-success w-100">Save Changes</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="mt-4 text-center">
+                <a href="{% url 'logout' %}" class="btn btn-danger btn-sm">Log Out</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
