@@ -1,12 +1,13 @@
 from django.shortcuts import render, redirect
 from .forms import CustomUserCreationForm, UserUpdateForm, CommentForm
 from django.contrib.auth.decorators import login_required
-from .models import Post, Comment, Tag
+from .models import Post, Comment
 from django.views.generic import ListView,DetailView,CreateView,UpdateView,DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy, reverse
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
+from taggit.models import Tag 
 # Create your views here.
 def registation(request):
     """
@@ -68,7 +69,7 @@ class PostDetailView(DetailView):
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
     template_name = 'blog/post_form.html' 
-    fields = ['title', 'content']         
+    fields = ['title', 'content', 'tags']         
     
     success_url = reverse_lazy('post-list') 
 
@@ -171,10 +172,10 @@ class TagFilterView(ListView):
     context_object_name = 'posts'
     ordering = ['-published_date']
 
-    def get_queryset(self):       
-        tag_name = self.kwargs.get('tag_name')       
-        tag = get_object_or_404(Tag, name__iexact=tag_name)       
-        return tag.posts.all().order_by('-published_date')
+    def get_queryset(self): 
+        if tag_name:      
+              return tag.posts.all().order_by('-published_date')
+        return super().get_queryset()
 
     def get_context_data(self, **kwargs):
         # Pass the current tag name to the template for display
