@@ -167,7 +167,7 @@ class PostSearchView(ListView):
             context['query'] = self.request.GET.get('q')
             return context
 
-class TagFilterView(ListView):
+class PostByTagListView(ListView):
     model = Post
     template_name = 'blog/post_list.html'  # Reuse the main post list template
     context_object_name = 'posts'
