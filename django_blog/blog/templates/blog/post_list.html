@@ -1,0 +1,33 @@
+{% extends 'blog/base.html' %}
+{% block title %}All Blog Posts{% endblock title %}
+
+{% block content %}
+<h1 class="mb-4">Latest Blog Posts</h1>
+
+{% for post in posts %}
+    <article class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <h2 class="card-title">
+                <a href="{% url 'post-detail' pk=post.pk %}" class="text-decoration-none text-primary">
+                    {{ post.title }}
+                </a>
+            </h2>
+            
+            <p class="card-text text-muted small">
+                Posted by <span class="fw-bold">{{ post.author.username }}</span> on {{ post.published_date|date:"F d, Y" }}
+            </p>
+            
+            <p class="card-text">
+                {{ post.content|truncatechars:200 }} 
+                <a href="{% url 'post-detail' pk=post.pk %}" class="text-info small">Read More &rarr;</a>
+            </p>
+            
+        </div>
+    </article>
+{% empty %}
+    <div class="alert alert-info" role="alert">
+        No blog posts have been published yet. Be the first!
+    </div>
+{% endfor %}
+
+{% endblock content %}

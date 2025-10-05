@@ -1,0 +1,26 @@
+{% extends 'blog/base.html' %}
+{% block title %}Confirm Delete{% endblock title %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-lg p-5 mt-5 border-danger">
+            <h1 class="card-title text-center mb-4 text-danger">Confirm Deletion</h1>
+
+            <div class="alert alert-warning text-center" role="alert">
+                Are you sure you want to permanently delete the post titled:
+                <h4 class="mt-2 fst-italic fw-bold text-dark">"{{ object.title }}"?</h4>
+            </div>
+
+            <form method="POST">
+                {% csrf_token %}
+                
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-danger btn-lg">Yes, Delete Post</button>
+                    <a href="{% url 'post-detail' pk=object.pk %}" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}
