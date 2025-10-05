@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .forms import CustomUserCreationForm, UserUpdateForm, CommentForm
+from .forms import CustomUserCreationForm, UserUpdateForm, CommentForm,PostForm
 from django.contrib.auth.decorators import login_required
 from .models import Post, Comment
 from django.views.generic import ListView,DetailView,CreateView,UpdateView,DeleteView
@@ -69,7 +69,8 @@ class PostDetailView(DetailView):
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
     template_name = 'blog/post_form.html' 
-    fields = ['title', 'content', 'tags']         
+    fields = ['title', 'content', 'tags']        
+    form_class = PostForm 
     
     success_url = reverse_lazy('post-list') 
 
