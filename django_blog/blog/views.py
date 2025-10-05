@@ -1,11 +1,12 @@
 from django.shortcuts import render, redirect
 from .forms import CustomUserCreationForm, UserUpdateForm, CommentForm
 from django.contrib.auth.decorators import login_required
-from .models import Post, Comment
+from .models import Post, Comment, Tag
 from django.views.generic import ListView,DetailView,CreateView,UpdateView,DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy, reverse
 from django.shortcuts import get_object_or_404
+from django.db.models import Q
 # Create your views here.
 def registation(request):
     """
@@ -105,28 +106,21 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
        
         post = get_object_or_404(Post, pk=self.kwargs.get('pk'))
-        
-        
         form.instance.author = self.request.user
         form.instance.post = post
-        
-        
-        response = super().form_valid(form)
-        
-        
-     
-        
+        response = super().form_valid(form)     
+              
         return response
 
     def get_success_url(self):        
-        return redirect('post-detail', pk=new_comment.post.pk)
+        return reverse('post-detail', kwargs={'pk': self.object.post.pk})
 
 class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Comment
     form_class = CommentForm
-    template_name = 'blog/comment_form.html' # Use a simple template for editing
+    template_name = 'blog/comment_form.html' 
     
-    # Permission Check: Ensures only the author can access the update form
+    
     def test_func(self):
         comment = self.get_object()
         return self.request.user == comment.author
@@ -147,3 +141,43 @@ class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     # Define where to redirect after deletion
     def get_success_url(self):
         return reverse_lazy('post-detail', kwargs={'pk': self.object.post.pk})
+    
+class PostSearchView(ListView):
+        model = Post
+        template_name = 'blog/search_results.html'
+        context_object_name = 'search_results'
+        ordering = ['-published_date']
+
+        def get_queryset(self):     
+            query = self.request.GET.get('q')
+
+            if query:            
+                queryset = Post.objects.filter(Q(title__icontains=query) |  Q(content__icontains=query) |  Q(tags__name__icontains=query)).distinct()  
+            else:
+           
+                queryset = Post.objects.none() 
+
+            return queryset
+
+        def get_context_data(self, **kwargs):
+            context = super().get_context_data(**kwargs)
+                                          
+            context['query'] = self.request.GET.get('q')
+            return context
+
+class TagFilterView(ListView):
+    model = Post
+    template_name = 'blog/post_list.html'  # Reuse the main post list template
+    context_object_name = 'posts'
+    ordering = ['-published_date']
+
+    def get_queryset(self):       
+        tag_name = self.kwargs.get('tag_name')       
+        tag = get_object_or_404(Tag, name__iexact=tag_name)       
+        return tag.posts.all().order_by('-published_date')
+
+    def get_context_data(self, **kwargs):
+        # Pass the current tag name to the template for display
+        context = super().get_context_data(**kwargs)
+        context['current_tag'] = self.kwargs.get('tag_name')
+        return context

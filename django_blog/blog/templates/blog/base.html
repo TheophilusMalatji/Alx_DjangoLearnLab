@@ -24,6 +24,17 @@
             </div>
         </div>
     </nav>
+    <form action="{% url 'post-search' %}" method="GET" class="d-flex">
+    <input 
+        type="search" 
+        name="q" 
+        class="form-control me-2" 
+        placeholder="Search posts, titles, tags..." 
+        aria-label="Search"
+        value="{{ request.GET.q|default_if_none:'' }}"
+    >
+    <button class="btn btn-outline-light" type="submit">Search</button>
+</form>
 
     <div class="container mt-4">
         {% if messages %}
