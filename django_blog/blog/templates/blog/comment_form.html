@@ -1,0 +1,37 @@
+{% extends 'blog/base.html' %}
+{% block title %}Edit Comment{% endblock title %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow-lg p-5 mt-5">
+            <h1 class="card-title text-center mb-4 text-primary">Edit Your Comment</h1>
+
+            <p class="text-muted text-center mb-4">
+                On post: <span class="fw-bold">{{ object.post.title }}</span>
+            </p>
+
+            <form method="POST">
+                {% csrf_token %}
+                
+                {% for field in form %}
+                    <div class="mb-3">
+                        <label for="{{ field.id_for_label }}" class="form-label fw-bold">{{ field.label }}</label>
+                        
+                       
+
+                        {% for error in field.errors %}
+                            <div class="invalid-feedback d-block text-danger">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+                
+                <div class="d-grid gap-2 mt-4">
+                    <button type="submit" class="btn btn-warning btn-lg">Update Comment</button>
+                    <a href="{% url 'post-detail' pk=object.post.pk %}" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}

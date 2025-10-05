@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}Delete Comment{% endblock title %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow-lg p-5 mt-5 border-danger">
+            <h1 class="card-title text-center mb-4 text-danger">Confirm Deletion</h1>
+
+            <div class="alert alert-warning text-center" role="alert">
+                <p class="mb-2">Are you sure you want to permanently delete this comment on the post:</p>
+                <h4 class="mt-2 fst-italic fw-bold text-dark">"{{ object.post.title }}"?</h4>
+            </div>
+
+            <blockquote class="blockquote border-start border-danger border-5 ps-3 py-2 my-4 bg-light">
+                <p class="mb-0 small text-muted">{{ object.content|truncatechars:100 }}</p>
+                <footer class="blockquote-footer mt-1">{{ object.author.username }}</footer>
+            </blockquote>
+
+            <form method="POST">
+                {% csrf_token %}
+                
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-danger btn-lg">Yes, Delete Comment</button>
+                    <a href="{% url 'post-detail' pk=object.post.pk %}" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}

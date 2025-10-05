@@ -23,6 +23,31 @@
             </p>
             
         </div>
+        <span class="badge bg-secondary fs-6">
+        Total Comments: {{ all_comments|length }}
+    </span>{% if user.is_authenticated %}
+    <div class="card p-4 mt-5 shadow">
+        <h5>Leave a Comment:</h5>
+        
+        <form method="POST" action="{% url 'comment-create' pk=post.pk %}">
+            {% csrf_token %}
+            
+            <div class="mb-3">
+                <label for="{{ comment_form.content.id_for_label }}" class="form-label">{{ comment_form.content.label }}</label>
+                {{ comment_form.content }}
+                {% for error in comment_form.content.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                {% endfor %}
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Submit Comment</button>
+        </form>
+    </div>
+{% else %}
+    <div class="alert alert-warning text-center mt-5">
+        Please <a href="{% url 'login' %}">log in</a> to leave a comment.
+    </div>
+{% endif %}
     </article>
 {% empty %}
     <div class="alert alert-info" role="alert">
