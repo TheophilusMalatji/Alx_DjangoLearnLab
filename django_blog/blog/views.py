@@ -18,7 +18,7 @@ def registation(request):
 
     context = {'form':form}
 
-    return render(request,'blog/registration.html',context)
+    return render(request,'blog/register.html',context)
 
 @login_required 
 def profile(request):
