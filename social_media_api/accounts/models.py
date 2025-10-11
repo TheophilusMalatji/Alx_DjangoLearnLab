@@ -3,7 +3,7 @@ from django.contrib.auth.models import AbstractUser
 
 # Create your models here.
 class CustomUser(AbstractUser):
-    bio = models.CharField(max_length=500, blank=True, null=True)
+    bio = models.TextField(max_length=500, blank=True, null=True)
     profile_picture = models.ImageField(blank=True, null=True)
     followers = models.ManyToManyField('self',symmetrical=False,blank=True)
 
