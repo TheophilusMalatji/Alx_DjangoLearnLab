@@ -1,6 +1,6 @@
 from django.shortcuts import render
-from accounts.models import Post, Comment
-from ..posts.permissions import IsOwnerOrReadOnly
+from .models import Post, Comment
+from .permissions import IsOwnerOrReadOnly
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.pagination import PageNumberPagination
 from rest_framework import filters, viewsets

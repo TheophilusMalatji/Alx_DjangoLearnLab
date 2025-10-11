@@ -8,7 +8,7 @@ from rest_framework.authtoken.models import Token
 from django.contrib.auth import get_user_model
 
 
-from .serializers import UserRegistrationSerializer, UserLoginSerializer, UserProfileSerializer, PostSerializer,CommentSerializer
+from .serializers import UserRegistrationSerializer, UserLoginSerializer, UserProfileSerializer
 
 CustomUser = get_user_model()
 

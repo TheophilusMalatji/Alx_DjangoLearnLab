@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Post, Comment
+from models import Post, Comment
 from django.contrib.auth import authenticate, get_user_model # Added get_user_model
 from accounts.serializers import AuthorSerializer
 

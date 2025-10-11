@@ -2,6 +2,7 @@ from django.db import models
 from accounts.models import CustomUser
 
 # Create your models here.
+#models.Textfield() was already implemented
 class Post(models.Model):
     author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     title = models.TextField(max_length=100)
