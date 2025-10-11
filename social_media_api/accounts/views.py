@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnl
 from accounts.models import Post, Comment
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import get_user_model
-from .permissions import IsOwnerOrReadOnly
+from ..posts.permissions import IsOwnerOrReadOnly
 
 from .serializers import UserRegistrationSerializer, UserLoginSerializer, UserProfileSerializer, PostSerializer,CommentSerializer
 

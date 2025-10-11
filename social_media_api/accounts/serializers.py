@@ -1,7 +1,8 @@
 from rest_framework import serializers
+from .models import CustomUser
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate, get_user_model # Added get_user_model
-from .models import CustomUser, Post, Comment
+
 
 # Use get_user_model for explicit access to the configured user model
 User = get_user_model()
