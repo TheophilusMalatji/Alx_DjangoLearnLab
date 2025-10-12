@@ -10,4 +10,6 @@ router.register(r'feed', views.FeedViewSet, basename='feed')
 
 urlpatterns = [      
     path('', include(router.urls)),
+    path('posts/<int:pk>/like/', views.PostViewSet.as_view({'post': 'like'}), name='post-like'),
+    path('posts/<int:pk>/unlike/', views.PostViewSet.as_view({'post': 'unlike'}), name='post-unlike'),
 ]
