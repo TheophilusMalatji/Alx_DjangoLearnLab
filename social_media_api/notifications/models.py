@@ -32,6 +32,7 @@ class Notification(models.Model):
     
     read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+    timestamp = models.DateTimeField(auto_now_add=True, null=True)
     
     class Meta:
         ordering = ['-timestamp']
