@@ -6,6 +6,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework import filters, viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from django.shortcuts import get_object_or_404 
 from django.contrib.auth import get_user_model
 from notifications.models import Notification
 from .serializers import PostSerializer, CommentSerializer
@@ -25,6 +26,7 @@ def create_like_notification(post, liker):
 
 def create_comment_notification(comment):
     """Creates a notification for the post's author when their post is commented on."""
+    # FIX: Corrected typo from comment.posta to comment.post
     post = comment.post
     if post.author != comment.author:
         Notification.objects.create(
@@ -69,16 +71,17 @@ class PostViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
     def like(self, request, pk=None):
-        """Action to like a specific post."""
+        """Action to like a specific post. Uses get_or_create logic implicitly."""
         post = self.get_object()
         user = request.user
         
-        like_qs = Like.objects.filter(post=post, user=user)
-        if like_qs.exists():
-            return Response({'detail': 'Post already liked.'}, status=status.HTTP_400_BAD_REQUEST)
+        # Using get_or_create is more atomic than separate filter/create logic
+        like_obj, created = Like.objects.get_or_create(post=post, user=user)
 
-        # Create the Like object and the notification
-        Like.objects.create(post=post, user=user)
+        if not created:
+             return Response({'detail': 'Post already liked.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Create the notification only if the like was newly created
         create_like_notification(post, user)
         
         return Response({'detail': 'Post liked successfully.'}, status=status.HTTP_201_CREATED)
@@ -98,11 +101,7 @@ class PostViewSet(viewsets.ModelViewSet):
         return Response({'detail': 'Post was not liked.'}, status=status.HTTP_400_BAD_REQUEST)
 
 class CommentViewSet(viewsets.ModelViewSet):
-    """
-    Provides CRUD operations for Comments.
-    Permissions: Read-only for all, Write/Edit/Delete only for the author.
-    Pagination is implemented.
-    """
+    """Provides CRUD operations for Comments."""
     # Fetch all comments, ordered by creation time descending (newest first)
     queryset = Comment.objects.all().order_by('-created_at')
     serializer_class = CommentSerializer
@@ -111,18 +110,6 @@ class CommentViewSet(viewsets.ModelViewSet):
     # Only the author can edit/delete (PUT/PATCH/DELETE) their own comments.
     permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
     
-    pagination_class = StandardResultsPagination
-    
-    def perform_create(self, serializer):
-        """When creating a comment, automatically set the author to the request user."""
-        serializer.save(author=self.request.user)
-
-class CommentViewSet(viewsets.ModelViewSet):
-    """Provides CRUD operations for Comments."""
-    queryset = Comment.objects.all().order_by('-created_at')
-    serializer_class = CommentSerializer
-    
-    permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
     pagination_class = StandardResultsPagination
     
     def perform_create(self, serializer):
@@ -144,4 +131,5 @@ class FeedViewSet(viewsets.ReadOnlyModelViewSet):
             return Post.objects.none() 
             
         following_users = user.following.all()
+        # Filter posts where the author is in the list of users the current user follows
         return Post.objects.filter(author__in=following_users).order_by('-created_at')
