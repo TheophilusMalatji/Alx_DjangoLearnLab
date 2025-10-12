@@ -6,6 +6,7 @@ from . import views
 router = DefaultRouter()
 router.register(r'posts', views.PostViewSet, basename='post')
 router.register(r'comments', views.CommentViewSet, basename='comment')
+router.register(r'feed', views.FeedViewSet, basename='feed')
 
 urlpatterns = [      
     path('', include(router.urls)),
