@@ -71,11 +71,12 @@ class PostViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
     def like(self, request, pk=None):
-        """Action to like a specific post. Uses get_or_create logic implicitly."""
-        post = self.get_object()
+        """Action to like a specific post. Explicitly uses get_object_or_404 and get_or_create."""
+        # Explicitly using get_object_or_404 as requested
+        post = get_object_or_404(Post, pk=pk)
         user = request.user
         
-        # Using get_or_create is more atomic than separate filter/create logic
+        # Explicitly using Like.objects.get_or_create as requested
         like_obj, created = Like.objects.get_or_create(post=post, user=user)
 
         if not created:
@@ -88,8 +89,9 @@ class PostViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
     def unlike(self, request, pk=None):
-        """Action to unlike a specific post."""
-        post = self.get_object()
+        """Action to unlike a specific post. Explicitly uses get_object_or_404."""
+        # Explicitly using get_object_or_404 as requested
+        post = get_object_or_404(Post, pk=pk)
         user = request.user
         
         # Attempt to find and delete the like
